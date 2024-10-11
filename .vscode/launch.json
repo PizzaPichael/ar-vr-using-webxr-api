@@ -1,0 +1,14 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open index.html",
+            "file": "c:\\Users\\Jetzt\\OneDrive\\Uni\\Informatik in Kultur und Gesundheit\\Semester 4\\Computergrafik\\Uebungen\\cgws24\\ar-vr-using-webxr-api\\ch2\\index.html"
+        }
+    ]
+}
