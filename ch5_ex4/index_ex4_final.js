@@ -9,6 +9,8 @@ function main() {
         canvas,
         antialias: true
     });
+    gl.shadowMap.enabled = true;
+
 
     // create camera
     const angleOfView = 55;
@@ -55,6 +57,7 @@ function main() {
         planeWidth,
         planeHeight
     );
+    
 
     // MATERIALS
     const textureLoader = new THREE.TextureLoader();
@@ -98,11 +101,13 @@ function main() {
 
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.position.set(-sphereRadius - 1, sphereRadius + 2, 0);
+    sphere.castShadow = true;
     scene.add(sphere);
 
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = Math.PI / 2;
-    //scene.add(plane);
+    plane.receiveShadow = true;
+    scene.add(plane);
 
     //LIGHTS
     const color = 0xffffff;
@@ -117,6 +122,12 @@ function main() {
     const ambientIntensity = 0.2;
     const ambientLight = new THREE.AmbientLight(ambientColor, ambientIntensity);
     scene.add(ambientLight);
+
+    // add spotlight for the shadows
+    var spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(-10, 20, -5);
+    spotLight.castShadow = true;
+    scene.add(spotLight);
 
     var controls = new function () {
         this.rotationSpeed = 0.02;
