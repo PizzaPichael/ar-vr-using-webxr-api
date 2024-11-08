@@ -13,19 +13,23 @@ function main() {
     /*========== Define and Store the Geometry ==========*/
     const squares = [
         // front face
+        //Triangle 1-3
         -0.3 , -0.3, -0.3,
-         0.3, -0.3, -0.3,
-         0.3, 0.3, -0.3,  
+        0.3, -0.3, -0.3,
+        0.3, 0.3, -0.3,  
 
+        //Triangle 4-6
         -0.3, -0.3, -0.3,
         -0.3, 0.3, -0.3,
-         0.3, 0.3, -0.3,                  
+        0.3, 0.3, -0.3,                  
 
-         // back face
+        // back face
+        //Triangle 7-9
         -0.2, -0.2, 0.3,
         0.4, -0.2, 0.3,
         0.4, 0.4, 0.3, 
 
+        //Triangle 10-12
         -0.2, -0.2, 0.3,
         -0.2, 0.4, 0.3,
         0.4, 0.4, 0.3, 
@@ -37,16 +41,20 @@ function main() {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(squares), gl.STATIC_DRAW);
 
     const squareColors = [
+      // front face colors
+        0.5,  0.0,  0.9,  1.0,
         0.0,  0.0,  1.0,  1.0,
-        0.0,  0.0,  1.0,  1.0,
-        0.0,  0.0,  1.0,  1.0,
-        0.0,  0.0,  1.0,  1.0,
-        0.0,  0.0,  1.0,  1.0,
-        0.0,  0.0,  1.0,  1.0,
+        1.0,  0.0,  1.0,  1.0,
 
+        0.0,  1.0,  1.0,  1.0,
+        0.0,  0.0,  1.0,  1.0,
+        1.0,  1.0,  1.0,  1.0,
+
+        // back face colors
         1.0,  0.0,  0.0,  1.0,   
         1.0,  0.0,  0.0,  1.0,  
-        1.0,  0.0,  0.0,  1.0,  
+        1.0,  0.0,  1.0,  1.0,
+
         1.0,  0.0,  0.0,  1.0,  
         1.0,  0.0,  0.0,  1.0,  
         1.0,  0.0,  0.0,  1.0,
@@ -65,8 +73,13 @@ function main() {
         varying lowp vec4 vColor;
 
         void main() {
+           
             gl_Position = aPosition;
             vColor = aVertexColor;
+             /*
+            gl_Position = aVertexColor;
+            vColor = aPosition;
+            */
       }
   `;
 
@@ -121,7 +134,8 @@ function main() {
     /*========== Drawing ========== */
     gl.clearColor(1, 1, 1, 1);
     
-    gl.enable(gl.DEPTH_TEST);
+    // Mit der Einstellung gl.DEPTH_TEST wird der Z-Buffer benutzt, um auf Pixelebene zu prüfen, was vorne und was hinten ist bzw. wer was verdeckt.
+    gl.enable(gl.DEPTH_TEST); 
     //gl.depthFunc(gl.LEQUAL);
     
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

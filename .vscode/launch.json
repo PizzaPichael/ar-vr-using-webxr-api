@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Open index.html",
-            "file": "c:\\Users\\Jetzt\\OneDrive\\Uni\\Informatik in Kultur und Gesundheit\\Semester 4\\Computergrafik\\Uebungen\\cgws24\\ar-vr-using-webxr-api\\ch2\\index.html"
+            "file": "${workspaceFolder}/${relativeFile}"
         }
     ]
 }

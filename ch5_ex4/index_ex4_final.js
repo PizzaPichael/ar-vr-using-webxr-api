@@ -60,7 +60,7 @@ function main() {
     const textureLoader = new THREE.TextureLoader();
 
     const cubeMaterial = new THREE.MeshPhongMaterial({
-        color: 'pink'
+        color: 'purple',
     });
 
     const sphereNormalMap = textureLoader.load('textures/sphere_normal.png');
@@ -93,6 +93,7 @@ function main() {
     // MESHES
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
     cube.position.set(cubeSize + 1, cubeSize + 1, 0);
+    cube.castShadow = true;
     scene.add(cube);
 
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -117,16 +118,32 @@ function main() {
     const ambientLight = new THREE.AmbientLight(ambientColor, ambientIntensity);
     scene.add(ambientLight);
 
+    var controls = new function () {
+        this.rotationSpeed = 0.02;
+    };
+
+    var gui = new dat.GUI();
+    gui.add(controls, 'rotationSpeed', 0, 0.5);
+
+    var stats = initStats();
+    var trackballControls = initTrackballControls(camera, gl);
+    var clock = new THREE.Clock();
+
+
     // DRAW
     function draw(time){
         time *= 0.001;
+
+        trackballControls.update(clock.getDelta());
+        stats.update();
+
 
         if (resizeGLToDisplaySize(gl)) {
             const canvas = gl.domElement;
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
             camera.updateProjectionMatrix();
         }
-        
+        /*
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.01;
         cube.rotation.z += 0.01;
@@ -134,10 +151,23 @@ function main() {
         sphere.rotation.x += 0.01;
         sphere.rotation.y += 0.01;
         sphere.rotation.y += 0.01;
+        */
+
+        // rotate the cube around its axes
+        cube.rotation.x += controls.rotationSpeed;
+        cube.rotation.y += controls.rotationSpeed;
+        cube.rotation.z += controls.rotationSpeed;
+
+        // rotate the sphere around its axes
+        sphere.rotation.x += controls.rotationSpeed;
+        sphere.rotation.y += controls.rotationSpeed;
+        sphere.rotation.z += controls.rotationSpeed;
 
         light.position.x = 20*Math.cos(time);
         light.position.y = 20*Math.sin(time);
+
         gl.render(scene, camera);
+        
         requestAnimationFrame(draw);
     }
 
