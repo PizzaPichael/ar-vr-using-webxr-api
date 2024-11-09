@@ -1,4 +1,4 @@
-import * as THREE from './modules/three.module.js';
+//import * as THREE from './modules/three.module.js';
 
 main();
 
@@ -9,7 +9,7 @@ function main() {
         canvas,
         antialias: true
     });
-    gl.shadowMap.enabled = true;
+    
 
 
     // create camera
@@ -96,14 +96,13 @@ function main() {
     // MESHES
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
     cube.position.set(cubeSize + 1, cubeSize + 1, 0);
-    cube.castShadow = true;
     scene.add(cube);
 
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.position.set(-sphereRadius - 1, sphereRadius + 2, 0);
-    sphere.castShadow = true;
     scene.add(sphere);
 
+    //Create plane for shadows
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = Math.PI / 2;
     plane.receiveShadow = true;
@@ -123,23 +122,89 @@ function main() {
     const ambientLight = new THREE.AmbientLight(ambientColor, ambientIntensity);
     scene.add(ambientLight);
 
+    // Aufgabe b)
+    //Add shadowMap to renderer
+    gl.shadowMap.enabled = true;
+    cube.castShadow = true; //Add shadow to cube
+    sphere.castShadow = true;   //Add shadow to sphere
+
     // add spotlight for the shadows
     var spotLight = new THREE.SpotLight(0xffffff);
     spotLight.position.set(-10, 20, -5);
     spotLight.castShadow = true;
     scene.add(spotLight);
 
-    var controls = new function () {
+    // add controls for rotationSpeed
+    /*var controls = new function () {
         this.rotationSpeed = 0.02;
-    };
+    };*/
 
-    var gui = new dat.GUI();
-    gui.add(controls, 'rotationSpeed', 0, 0.5);
+    // add the gui
+    /*var gui = new dat.GUI();
+    gui.add(controls, 'rotationSpeed', 0, 0.5);*/
 
+    // add the stats
     var stats = initStats();
     var trackballControls = initTrackballControls(camera, gl);
     var clock = new THREE.Clock();
 
+    // Aufgabe c)
+    var texture = textureLoader.load('textures/stone.jpg');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+
+    var loader = new THREE.OBJLoader();
+
+    loader.load('objects/teapot.obj',
+        function(mesh) {
+                var material = new THREE.MeshPhongMaterial({map:texture});
+        
+                mesh.children.forEach(function(child) {
+                child.material = material;
+                child.castShadow = true;
+                });
+
+                mesh.position.set(-15, 2, 0);
+                mesh.rotation.set(-Math.PI / 2, 0, 0);
+                mesh.scale.set(0.005, 0.005, 0.005);
+        
+            scene.add(mesh);
+        },
+        function ( xhr ) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        },
+        function ( error ) {
+            console.log(error);
+            console.log( 'An error happened' );
+        }
+    );
+
+
+    // Schritt 4: Abschlussaufgabe
+
+    let h1 = 1;
+    let h2 = 0.8;
+    let h3 = 0.6;
+
+    let seg1, seg2, seg3;
+    seg1 = addSeg(scene, h1, 0);
+    seg2 = addSeg(seg1, h2, h1);
+    seg3 = addSeg(seg2, h3, h2);
+
+    var controls = new function () {
+        this.rotationSpeed = 0.02;
+        this.rotY1 = 0;
+        this.rotZ1 = 0;
+        this.rotZ2 = 0;
+        this.rotZ3 = 0;
+    };
+
+    var gui = new dat.GUI();
+    gui.add(controls, 'rotationSpeed', 0, 0.5);
+    gui.add(controls, 'rotY1', 0, 2 * Math.PI);
+    gui.add(controls, 'rotZ1', 0, 2 * Math.PI);
+    gui.add(controls, 'rotZ2', 0, 2 * Math.PI);
+    gui.add(controls, 'rotZ3', 0, 2 * Math.PI);    
 
     // DRAW
     function draw(time){
@@ -154,16 +219,8 @@ function main() {
             camera.aspect = canvas.clientWidth / canvas.clientHeight;
             camera.updateProjectionMatrix();
         }
-        /*
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
-        cube.rotation.z += 0.01;
 
-        sphere.rotation.x += 0.01;
-        sphere.rotation.y += 0.01;
-        sphere.rotation.y += 0.01;
-        */
-
+        //Aufgb b)
         // rotate the cube around its axes
         cube.rotation.x += controls.rotationSpeed;
         cube.rotation.y += controls.rotationSpeed;
@@ -173,6 +230,19 @@ function main() {
         sphere.rotation.x += controls.rotationSpeed;
         sphere.rotation.y += controls.rotationSpeed;
         sphere.rotation.z += controls.rotationSpeed;
+
+        /*
+        // rotate the teapot around its axes
+        teapot.rotation.x += controls.rotationSpeed;
+        teapot.rotation.y += controls.rotationSpeed;
+        teapot.rotation.z += controls.rotationSpeed;
+        */
+
+        //Schritt 4: Abschlussaufgabe
+        seg1.rotation.y = controls.rotY1;
+        seg1.rotation.z = controls.rotZ1;
+        seg2.rotation.z = controls.rotZ2;
+        seg3.rotation.z = controls.rotZ3;
 
         light.position.x = 20*Math.cos(time);
         light.position.y = 20*Math.sin(time);
@@ -196,3 +266,34 @@ function resizeGLToDisplaySize(gl) {
     }
     return needResize;
 }
+
+//Schirtt 4: Abschlussaufgabe
+function addSeg(parent, height, posY) {
+    var axisSphere = new THREE.Group();
+    axisSphere.position.y = posY;
+    parent.add(axisSphere);
+
+    var sphereGeometry = new THREE.SphereGeometry(1, 20, 20); // radius 1 -> diameter 2
+    var sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x7777ff });
+    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+    // position the sphere
+    sphere.scale.x = 1
+    sphere.scale.y = 1*height
+    sphere.scale.z = 1
+    sphere.position.x = 1
+    sphere.position.y = 1
+    sphere.position.z = 1
+    sphere.castShadow = true;
+
+    sphere.receiveShadow = true;
+
+    axisSphere.add(sphere);
+
+    const tripod = new THREE.AxesHelper(5);
+    axisSphere.add(tripod);
+
+    return axisSphere;
+}
+
+//Für den ROboterarm dreimal hintereinander die addSeg Funktion aufrufen
