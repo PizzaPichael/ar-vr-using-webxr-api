@@ -180,34 +180,22 @@ function main() {
     );
 
 
-    // Schritt 4: Abschlussaufgabe
-
-    let h1 = 3;
-    let h2 = 2.4;
-    let h3 = 1.8;
-
-    let seg1, seg2, seg3, pointlight1;
-    seg1 = addSeg(scene, h1, 0, 0);
-    seg2 = addSeg(seg1, h2, h1, 1);
-    seg3 = addSeg(seg2, h3, h2, 2);
-    pointlight1 = addPointLight(seg3, h3, 3);
-
-    seg1.position.x = -25;
-
     var controls = new function () {
         this.rotationSpeed = 0.02;
-        this.rotY1 = 0;
-        this.rotZ1 = 0;
-        this.rotZ2 = 0;
-        this.rotZ3 = 0;
+        this.positionZ = 0;
+        this.moveCube = function() {
+            if (cube.position.z === 0) {
+                cube.position.z += 10;
+            } else {
+                cube.position.z = 0;
+            }
+        };
     };
 
     var gui = new dat.GUI();
     gui.add(controls, 'rotationSpeed', 0, 0.5);
-    gui.add(controls, 'rotY1', 0, 2 * Math.PI);
-    gui.add(controls, 'rotZ1', 0, 2 * Math.PI);
-    gui.add(controls, 'rotZ2', 0, 2 * Math.PI);
-    gui.add(controls, 'rotZ3', 0, 2 * Math.PI);    
+    gui.add(controls, 'positionZ', 0, 100);
+    gui.add(controls, 'moveCube').name('Move Cube');
 
     // DRAW
     function draw(time){
@@ -234,21 +222,9 @@ function main() {
         sphere.rotation.y += controls.rotationSpeed;
         sphere.rotation.z += controls.rotationSpeed;
 
-        /*
-        // rotate the teapot around its axes
-        teapot.rotation.x += controls.rotationSpeed;
-        teapot.rotation.y += controls.rotationSpeed;
-        teapot.rotation.z += controls.rotationSpeed;
-        */
-
-        //Schritt 4: Abschlussaufgabe
-        seg1.rotation.y = controls.rotY1;
-        seg1.rotation.z = controls.rotZ1;
-        seg2.rotation.z = controls.rotZ2;
-        seg3.rotation.z = controls.rotZ3;
-
-        //light.position.x = 20*Math.cos(time);
-        //light.position.y = 20*Math.sin(time);
+        // make stuff move on z axis
+        sphere.position.z = -controls.positionZ;
+        cube.position.z = -controls.positionZ;
 
         gl.render(scene, camera);
         
@@ -269,62 +245,3 @@ function resizeGLToDisplaySize(gl) {
     }
     return needResize;
 }
-
-//Schirtt 4: Abschlussaufgabe
-function addSeg(parent, height, posY, partNr) {
-    var axisSphere = new THREE.Group();
-    if (partNr == 0) {
-        axisSphere.position.y = posY;
-        
-    }
-    else {
-        axisSphere.position.y = 2*posY;
-    }
-        
-    parent.add(axisSphere);
-
-    var sphereGeometry = new THREE.SphereGeometry(1, 20, 20); // radius 1 -> diameter 2
-    var sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x7777ff });
-    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-
-    // position the sphere
-    sphere.scale.x = 1
-    sphere.scale.y = height
-    sphere.scale.z = 1
-    sphere.position.x = 0
-    sphere.position.y = height
-    sphere.position.z = 0
-    sphere.castShadow = true;
-
-    sphere.receiveShadow = true;
-
-    axisSphere.add(sphere);
-
-    const tripod = new THREE.AxesHelper(5);
-    axisSphere.add(tripod);
-
-    return axisSphere;
-}
-
-function addPointLight(parent, posY, partNr) {
-    var axisPointLight = new THREE.Group();
-    if (partNr == 0) {
-        axisPointLight.position.y = posY;
-    }
-    else {
-        axisPointLight.position.y = 2*posY;
-    }
-    parent.add(axisPointLight);
-
-    var pointLight = new THREE.PointLight(0x7FFF00);
-    pointLight.position.set(0, 0, 0);
-    pointLight.castShadow = true;
-    axisPointLight.add(pointLight);
-
-    const tripod = new THREE.AxesHelper(5);
-    axisPointLight.add(tripod);
-
-    return axisPointLight;
-}
-
-//Für den ROboterarm dreimal hintereinander die addSeg Funktion aufrufen
