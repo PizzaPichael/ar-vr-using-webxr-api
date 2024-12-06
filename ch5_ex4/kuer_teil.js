@@ -75,13 +75,15 @@ function main() {
     });
 
     
-    const planeTextureMap = textureLoader.load('textures/pebbles.jpg');
+    const planeTextureMap = textureLoader.load('textures/stone_texture4293.jpg');
     planeTextureMap.wrapS = THREE.RepeatWrapping;
     planeTextureMap.wrapT = THREE.RepeatWrapping;
     planeTextureMap.repeat.set(16, 16);
+    
     //planeTextureMap.magFilter = THREE.NearestFilter;
     planeTextureMap.minFilter = THREE.NearestFilter;
     planeTextureMap.anisotropy = gl.getMaxAnisotropy();
+    
     const planeNorm = textureLoader.load('textures/pebbles_normal.png');
     planeNorm.wrapS = THREE.RepeatWrapping;
     planeNorm.wrapT = THREE.RepeatWrapping;
@@ -94,13 +96,14 @@ function main() {
     });
 
     // MESHES
-    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    //Cube
+    /*const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
     cube.position.set(cubeSize + 1, cubeSize + 1, 0);
     scene.add(cube);
-
+    //Sphere
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.position.set(-sphereRadius - 1, sphereRadius + 2, 0);
-    scene.add(sphere);
+    scene.add(sphere);*/
 
     //Create plane for shadows
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -125,8 +128,8 @@ function main() {
     // Aufgabe b)
     //Add shadowMap to renderer
     gl.shadowMap.enabled = true;
-    cube.castShadow = true; //Add shadow to cube
-    sphere.castShadow = true;   //Add shadow to sphere
+    //cube.castShadow = true; //Add shadow to cube
+    //sphere.castShadow = true;   //Add shadow to sphere
 
     // add pointlight for the shadows
     /*var pointLight = new THREE.pointLight(0xffffff);
@@ -149,24 +152,46 @@ function main() {
     var clock = new THREE.Clock();
 
     // Aufgabe c)
-    var texture = textureLoader.load('textures/stone.jpg');
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
+    const stageTexture = textureLoader.load('textures/wood_cabinet/wood_cabinet_worn_long_diff_4k.jpg');
+    stageTexture.wrapS = THREE.RepeatWrapping;
+    stageTexture.wrapT = THREE.RepeatWrapping;
+    stageTexture.repeat.set(5, 5)
+
+    const stageNormalMap = textureLoader.load('textures/wood_cabinet/wood_planks_normal.png');
+    sphereNormalMap.wrapS = THREE.RepeatWrapping;
+    sphereNormalMap.wrapT = THREE.RepeatWrapping;
+    sphereNormalMap.repeat.set(5, 5)
+    
+    const stageRimTexture = textureLoader.load('textures/wood_cabinet/wood_cabinet_worn_long_diff_4k.jpg');
+    stageRimTexture.wrapS = THREE.RepeatWrapping;
+    stageRimTexture.wrapT = THREE.RepeatWrapping;
+
+    const celloTexture = textureLoader.load('textures/cello/10372_Cello_v01.jpg');
+    celloTexture.wrapS = THREE.RepeatWrapping;
+    celloTexture.wrapT = THREE.RepeatWrapping;
+
+    const pianoTexture = textureLoader.load('textures/piano/main_Albedo+Paint.png');
+    pianoTexture.wrapS = THREE.RepeatWrapping;
+    pianoTexture.wrapT = THREE.RepeatWrapping;
 
     var loader = new THREE.OBJLoader();
 
-    loader.load('objects/teapot.obj',
+    //----Bühnenobjekt----
+    loader.load('objects/buehneNachBlender.obj',
         function(mesh) {
-                var material = new THREE.MeshPhongMaterial({map:texture});
+                var material = new THREE.MeshPhongMaterial({map:stageTexture, normalMap: stageNormalMap});
         
-                mesh.children.forEach(function(child) {
-                child.material = material;
-                child.castShadow = true;
+                mesh.traverse(function(child) {
+                    if (child.isMesh) {
+                        child.material = material;
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
                 });
 
-                mesh.position.set(-15, 2, 0);
+                mesh.position.set(-15, 0, 0);
                 mesh.rotation.set(-Math.PI / 2, 0, 0);
-                mesh.scale.set(0.005, 0.005, 0.005);
+                mesh.scale.set(500, 500, 250);
         
             scene.add(mesh);
         },
@@ -179,23 +204,106 @@ function main() {
         }
     );
 
+    //----Bühnenumrandung----
+    loader.load('objects/stageRim38_5.obj',
+        function(mesh) {
+                var material = new THREE.MeshPhongMaterial({map:stageRimTexture});
+        
+                mesh.traverse(function(child) {
+                    if (child.isMesh) {
+                        child.material = material;
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                mesh.position.set(-15, 0, 0);
+                mesh.rotation.set(-Math.PI / 2, 0, 0);
+                mesh.scale.set(500, 500, 250);
+        
+            scene.add(mesh);
+        },
+        function ( xhr ) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        },
+        function ( error ) {
+            console.log(error);
+            console.log( 'An error happened' );
+        }
+    );
+
+    //----Piano----
+    loader.load('objects/piano/uploads_files_4987684_Piano.obj',
+        function(mesh) {
+                var material = new THREE.MeshPhongMaterial({map:pianoTexture});
+        
+                mesh.traverse(function(child) {
+                    if (child.isMesh) {
+                        child.material = material;
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                mesh.position.set(-7, 2.5, 8); //links(-)/rechts(+), oben/unten, vorne(+)/hinten(-)
+                mesh.rotation.set(0, -100, 0);
+                mesh.scale.set(0.038, 0.038, 0.038);
+        
+            scene.add(mesh);
+        },
+        function ( xhr ) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        },
+        function ( error ) {
+            console.log(error);
+            console.log( 'An error happened' );
+        }
+    );
+
+    //----Cello----
+    loader.load('objects/cello/10372_Cello_v01_l3.obj',
+        function(mesh) {
+                var material = new THREE.MeshPhongMaterial({map:celloTexture});
+        
+                mesh.traverse(function(child) {
+                    if (child.isMesh) {
+                        child.material = material;
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                mesh.position.set(5, 2.5, 5); //links(-)/rechts(+), oben/unten, vorne(+)/hinten(-)
+                mesh.rotation.set(350, 0, 0); //300 = 90°
+                mesh.scale.set(0.01, 0.01, 0.01);
+        
+            scene.add(mesh);
+        },
+        function ( xhr ) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        },
+        function ( error ) {
+            console.log(error);
+            console.log( 'An error happened' );
+        }
+    );
 
     var controls = new function () {
         this.rotationSpeed = 0.02;
         this.positionZ = 0;
-        this.moveCube = function() {
+        /*this.moveCube = function() {
             if (cube.position.z === 0) {
                 cube.position.z += 10;
             } else {
                 cube.position.z = 0;
             }
-        };
+        };*/
     };
 
     var gui = new dat.GUI();
     gui.add(controls, 'rotationSpeed', 0, 0.5);
     gui.add(controls, 'positionZ', 0, 100);
-    gui.add(controls, 'moveCube').name('Move Cube');
+    //gui.add(controls, 'moveCube').name('Move Cube');
 
     // DRAW
     function draw(time){
@@ -213,7 +321,7 @@ function main() {
 
         //Aufgb b)
         // rotate the cube around its axes
-        cube.rotation.x += controls.rotationSpeed;
+        /*cube.rotation.x += controls.rotationSpeed;
         cube.rotation.y += controls.rotationSpeed;
         cube.rotation.z += controls.rotationSpeed;
 
@@ -224,7 +332,7 @@ function main() {
 
         // make stuff move on z axis
         sphere.position.z = -controls.positionZ;
-        cube.position.z = -controls.positionZ;
+        cube.position.z = -controls.positionZ;*/
 
         gl.render(scene, camera);
         
